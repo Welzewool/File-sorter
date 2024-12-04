@@ -4,22 +4,31 @@
 from os import listdir, makedirs
 from os.path import isfile, join
 from shutil import move
+from pathlib import Path
 
 from src.extensions import file_extensions
 
 
-file_path_download = "/home/dima/Загрузки"
+home_directory = Path.home()  # Путь к домашнему каталогу
+# подкаталоги относительно домашней папки
+download_path = home_directory / "Загрузки"
+
+images_path = home_directory / "Изображения"
+music_path = home_directory / "Музыка"
+video_path = home_directory / "Видео"
+documents_path = home_directory / "Документы"
+
 
 destinations = {
-"image": "/home/dima/Изображения",
-"audio": "/home/dima/Музыка",
-"video": "/home/dima/Видео",
-"documents": "/home/dima/Документы",
+"image": images_path,
+"audio": music_path,
+"video": video_path,
+"documents": documents_path,
 }
 
 
 # Получение списка файлов
-files_in_path = [file for file in listdir(file_path_download) if isfile(join(file_path_download, file))]
+files_in_path = [file for file in listdir(download_path) if isfile(join(download_path, file))]
 if not files_in_path:
     print("Каталог пуст")
 else:
@@ -43,7 +52,7 @@ def get_file_category(filename: str, extensions_dict: dict[str, str]) -> [str, N
     return None
 
 
-def sort_files(files: list[str], source_path: str, destinations_path: dict[str, str], extensions_dict: dict[str, str]):
+def sort_files(files: list[str], source_path, destinations_path, extensions_dict: dict[str, str]):
     """
     Функция определяет категорию каждого файла, перемешает его в соответсвующую папку
     :param files:
@@ -67,5 +76,5 @@ def sort_files(files: list[str], source_path: str, destinations_path: dict[str, 
 
 
 if __name__ == '__main__':
-    sort_files(files_in_path, file_path_download, destinations, file_extensions)
+    sort_files(files_in_path, download_path, destinations, file_extensions)
 
