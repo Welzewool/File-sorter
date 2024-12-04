@@ -1,6 +1,12 @@
 """Код для сортировки файлов по папкам"""
-from os import listdir
+# import os
+# import shutil
+from os import listdir, makedirs
 from os.path import isfile, join
+from shutil import move
+
+from src.extensions import file_extensions
+
 
 file_path_download = "/home/dima/Загрузки"
 
@@ -34,10 +40,31 @@ def get_file_category(filename: str, extensions_dict: dict[str, str]) -> [str, N
     return None
 
 
+def sort_files(files: list[str], source_path: str, destinations: dict, extensions_dict: dict[str, str]):
+    """
+    Функция определяет категорию каждого файла, перемешает его в соответсвующую папку
+    :param files:
+    :param source_path:
+    :param destinations:
+    :param extensions_dict:
+    :return:
+    """
+    for file in files:
+        category = get_file_category(file, extensions_dict)
+        if category and category in destinations:
+            destination_path = destinations[category]
+            makedirs(destination_path, exist_ok=True)  # создает папку, если её нет
+            try:
+                move(join(source_path, file), join(destination_path, file))     # перемещает файл
+                print(f"{file} moved to {destination_path}")
+            except Exception as e:
+                print(f"Ошибка при перемещении файла: {e}")
+        else:
+            print(f"Файл {file} оставлен в {source_path}, не определено расширение файла")
 
 
-
-
+if __name__ == '__main__':
+    sort_files(files_in_path, file_path_download, destinations, file_extensions)
 
 
 
