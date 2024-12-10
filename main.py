@@ -1,10 +1,9 @@
 """Код для сортировки файлов по папкам"""
-# import os
-# import shutil
-# from os import listdir, makedirs
-# from os.path import isfile, join
+import time
 from shutil import move
 from pathlib import Path
+from watchdog.observers import Observer
+from watchdog.events import FileSystemEventHandler
 
 from src.extensions import file_extensions
 
@@ -43,34 +42,55 @@ def get_file_category(filename: str, extensions_dict: dict[str, str]) -> [str, N
     return None
 
 
-def sort_files(files: list[Path], source_path: Path, destinations_dct: dict[str, Path], extensions_dict: dict[str, str]):
+def sort_files(file_path: Path):
     """
     Перемещает файлы в соответствующие папки на основе их категории.
-    :param files: Список файлов
-    :param source_path: Путь к исходной папке
-    :param destinations_dct: Словарь категорий и путей
-    :param extensions_dict: Словарь категорий и расширений
     """
-    for file in files:
-        category = get_file_category(file.name, extensions_dict)
-        if category and category in destinations_dct:
-            destination_path = destinations_dct[category]
-            destination_path.mkdir(parents=True, exist_ok=True)  # создает папку, если её нет
-            try:
-                move(str(file), str(destination_path / file.name))     # перемещает файл
-                print(f"Файл {file} был перемещен в папку {destination_path}")
-            except Exception as e:
-                print(f"Ошибка при перемещении файла {file.name}: {e}")
-        else:
-            print(f"Файл {file.name} оставлен в {source_path}, не определено расширение файла")
+    category = get_file_category(file_path.name, file_extensions)
+    if category and category in destinations:
+        destination_path = destinations[category]
+        destination_path.mkdir(parents=True, exist_ok=True)
+        try:
+            move(str(file_path), str(destination_path / file_path.name))
+            print(f"Файл {file_path.name} перемещён в {destination_path}")
+        except Exception as e:
+            print(f"Ошибка при перемещении файла {file_path.name}: {e}")
+    else:
+        print(f"Файл {file_path.name} оставлен в {download_path}: расширение не определено")
+
+
+class FileHandler(FileSystemEventHandler):
+    """
+    Класс для обработки файловых событий в папке.
+    """
+    def on_created(self, event):
+        """
+        Отслеживает появление нового файла.
+        Проверяет, что это файл, а не папка, и вызывает функцию сортировки
+        """
+        if not event.is_directory:
+            file_path = Path(event.src_path)
+            sort_files(file_path)
 
 
 if __name__ == '__main__':
-    # Получение списка файлов
-    files_in_path = [file for file in download_path.iterdir() if file.is_file()]
-    if not files_in_path:
-        print("Каталог пуст")
-    else:
-        print(f"Каталог содержит {len(files_in_path)} файла(-ов): {[file.name for file in files_in_path]}")
-        sort_files(files_in_path, download_path, destinations, file_extensions)
+    # # Получение списка файлов
+    # files_in_path = [file for file in download_path.iterdir() if file.is_file()]
+    # if not files_in_path:
+    #     print("Каталог пуст")
+    # else:
+    #     print(f"Каталог содержит {len(files_in_path)} файла(-ов): {[file.name for file in files_in_path]}")
+    #     sort_files(files_in_path, download_path, destinations, file_extensions)
+    event_handler = FileHandler()  # Обработчик событий
+    observer = Observer()  # Объект событий, следит за папкой
+    observer.schedule(event_handler, str(download_path), recursive=False)  # Запуск обработчика событий
 
+    try:
+        print(f"Наблюдение за папкой {download_path} запущено...")
+        observer.start()
+        while True:
+            time.sleep(1)
+    except KeyboardInterrupt:
+        print("Остановка скрипта")
+        observer.stop()
+    observer.join()  #
