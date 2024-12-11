@@ -17,7 +17,6 @@ music_path = home_directory / "Музыка"
 video_path = home_directory / "Видео"
 documents_path = home_directory / "Документы"
 
-
 destinations = {
 "image": images_path,
 "audio": music_path,
@@ -74,13 +73,6 @@ class FileHandler(FileSystemEventHandler):
 
 
 if __name__ == '__main__':
-    # # Получение списка файлов
-    # files_in_path = [file for file in download_path.iterdir() if file.is_file()]
-    # if not files_in_path:
-    #     print("Каталог пуст")
-    # else:
-    #     print(f"Каталог содержит {len(files_in_path)} файла(-ов): {[file.name for file in files_in_path]}")
-    #     sort_files(files_in_path, download_path, destinations, file_extensions)
     event_handler = FileHandler()  # Обработчик событий
     observer = Observer()  # Объект событий, следит за папкой
     observer.schedule(event_handler, str(download_path), recursive=False)  # Запуск обработчика событий
@@ -89,7 +81,7 @@ if __name__ == '__main__':
         print(f"Наблюдение за папкой {download_path} запущено...")
         observer.start()
         while True:
-            time.sleep(1)
+            time.sleep(1.5)
     except KeyboardInterrupt:
         print("Остановка скрипта")
         observer.stop()
