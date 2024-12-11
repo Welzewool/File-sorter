@@ -5,6 +5,7 @@ from pathlib import Path
 from watchdog.observers import Observer
 from watchdog.events import FileSystemEventHandler
 
+from src.file_category import get_file_category
 from src.extensions import file_extensions
 
 
@@ -24,22 +25,7 @@ destinations = {
 "documents": documents_path,
 }
 
-
 # disk_usage_download = disk_usage(file_path_download)
-
-def get_file_category(filename: str, extensions_dict: dict[str, str]) -> [str, None]:
-    """
-    Определяет категорию файла по его расширению.
-    :param filename: Имя файла
-    :param extensions_dict: Словарь категорий и расширений
-    :return: Категория или None
-    """
-    extension = filename.split(".")[-1].lower()  # Получение расширения файла
-    for category, extensions in extensions_dict.items():
-        if extension in extensions:
-            return category
-    return None
-
 
 def sort_files(file_path: Path):
     """
