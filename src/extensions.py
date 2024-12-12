@@ -1,3 +1,6 @@
+from pathlib import Path
+
+
 file_extensions = {
     'image': ['jpg', 'png', 'bmp', 'ai', 'psd', 'ico', 'jpeg', 'ps', 'svg', 'tif',
               'tiff'],
@@ -12,4 +15,14 @@ file_extensions = {
 
     'documents': ['pdf', 'txt', 'doc', 'docx', 'rtf', 'tex', 'wpd', 'odt', 'xlsx', 'xls', 'xlsm', 'ods',
                   'sql', 'sqlite', 'sqlite3', 'csv', 'dat', 'db', 'log', 'mdb', 'sav', 'tar', 'xml'],
+}
+
+home_directory = Path.home()  # Путь к домашнему каталогу
+
+# подкаталоги относительно домашней папки
+destinations = {
+    "image": home_directory / "Изображения",
+    "audio": home_directory / "Музыка",
+    "video": home_directory / "Видео",
+    "documents": home_directory / "Документы",
 }
